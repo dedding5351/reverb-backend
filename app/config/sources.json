@@ -1,0 +1,22 @@
+[
+    {
+        "id": "uber",
+        "name": "Uber Engineering",
+        "url": "https://www.uber.com/en-US/blog/engineering/"
+    },
+    {
+        "id": "stripe",
+        "name": "Stripe Engineering",
+        "url": "https://stripe.com/blog/engineering"
+    },
+    {
+        "id": "airbnb",
+        "name": "Airbnb Tech Blog",
+        "url": "https://airbnb.tech/blog/"
+    },
+    {
+        "id": "lyft",
+        "name": "Lyft Engineering",
+        "url": "https://eng.lyft.com/"
+    }
+]
