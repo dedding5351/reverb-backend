@@ -135,26 +135,39 @@ class AirbnbScraper(BlogScraper):
                      pass
 
         links = []
-        # Airbnb posts are usually <a> tags with "Read more" or inside <h3>
-        # Targeted selector: a tag with "Read more" text
-        read_more_links = soup.find_all("a", string="Read more")
-        for a in read_more_links:
-            href = a.get('href')
-            if href:
-                full_url = urljoin(base_url, href)
-                if full_url not in links:
-                    links.append(full_url)
-        
-        # Backup: check h3 > a
-        if not links:
-            for h3 in soup.find_all("h3"):
-                a = h3.find("a")
-                if a and a.get("href"):
-                    full_url = urljoin(base_url, a.get("href"))
-                    if full_url not in links:
-                        links.append(full_url)
+        # 1. Add links from RSS feed (High confidence)
+        if self.url_date_map:
+            links.extend(list(self.url_date_map.keys()))
 
-        return links
+        # 2. Generic Link Discovery (Fallback/Supplement)
+        # Look for all links that point to the same domain/path
+        for a in soup.find_all("a", href=True):
+            href = a['href']
+            # Normalize
+            full_url = urljoin(base_url, href)
+            
+            # Check if it belongs to Airbnb (loosen constraint)
+            # base_url might be .../blog/, but posts might be .../people/
+            domain = urlparse(base_url).netloc # airbnb.tech
+            if domain in full_url:
+                # Filter out obvious non-post links
+                if any(x in full_url for x in ["/tagged/", "/archive", "/followers", "/about", "/latest", "/feed", "/page/"]):
+                     continue
+                
+                # Exclude base URL itself and feed
+                if full_url.rstrip("/") == base_url.rstrip("/"):
+                     continue
+                if full_url.rstrip("/") == f"https://{domain}":
+                     continue
+
+                # Heuristic: URL length and presence of hyphens
+                path = urlparse(full_url).path
+                # Check for significant path length
+                if len(path) > 10 and (path.count("-") > 1 or path.count("/") > 2):
+                     if full_url not in links:
+                         links.append(full_url)
+        
+        return list(set(links)) # Deduplicate
 
     def _get_next_page(self, soup: BeautifulSoup, base_url: str) -> Optional[str]:
         # Airbnb uses /page/2/ etc.
@@ -244,5 +257,6 @@ class AirbnbScraper(BlogScraper):
             authors=authors,
             published_date=published_date,
             site_name="Airbnb Tech Blog",
-            image_url=image_url
+            image_url=image_url,
+            content=soup.find("article").get_text(separator="\n\n", strip=True) if soup.find("article") else None
         )

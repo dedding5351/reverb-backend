@@ -196,6 +196,17 @@ class LyftScraper(BlogScraper):
             if og_image:
                 image_url = og_image["content"]
 
+            image_url = og_image["content"]
+
+        # 6. Content
+        content = None
+        article = soup.find("article")
+        if article:
+            # Basic cleanup: remove styles, scripts
+            for tag in article(["script", "style", "noscript"]):
+                tag.decompose()
+            content = article.get_text(separator="\n\n", strip=True)
+
         return PostMetadata(
             title=title,
             url=post_url,
@@ -203,5 +214,6 @@ class LyftScraper(BlogScraper):
             authors=authors,
             published_date=published_date,
             site_name="Lyft Engineering",
-            image_url=image_url
+            image_url=image_url,
+            content=content
         )

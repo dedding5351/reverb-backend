@@ -10,3 +10,4 @@ class PostMetadata(BaseModel):
     published_date: Optional[datetime] = None
     site_name: Optional[str] = None
     image_url: Optional[HttpUrl] = None
+    content: Optional[str] = None

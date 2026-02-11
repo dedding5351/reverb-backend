@@ -138,6 +138,12 @@ class UberScraper(BlogScraper):
         if og_image:
             image_url = og_image["content"]
 
+        # 6. Content
+        content = None
+        main = soup.find("main")
+        if main:
+            content = main.get_text(separator="\n\n", strip=True)
+
         return PostMetadata(
             title=title,
             url=post_url,
@@ -145,5 +151,6 @@ class UberScraper(BlogScraper):
             authors=authors,
             published_date=published_date,
             site_name="Uber Engineering", # Hardcoded or scraped
-            image_url=image_url
+            image_url=image_url,
+            content=content
         )

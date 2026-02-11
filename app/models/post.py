@@ -1,8 +1,9 @@
-from sqlalchemy import Column, String, DateTime, Text, JSON
-from sqlalchemy.orm import Session
+from sqlalchemy import Column, String, DateTime, Text, JSON, Integer
+from sqlalchemy.orm import Session, mapped_column
 from app.database import Base
 from datetime import datetime
 import uuid
+from pgvector.sqlalchemy import Vector
 
 # SQLAlchemy Model (Active Record)
 class Post(Base):
@@ -17,6 +18,9 @@ class Post(Base):
     site_name = Column(String, nullable=True)
     source_id = Column(String, nullable=True)
     image_url = Column(String, nullable=True)
+    content = Column(Text, nullable=True)
+    embedding = mapped_column(Vector(3072), nullable=True)
+    read_time_minutes = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     def save(self, db: Session):

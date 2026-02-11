@@ -104,6 +104,12 @@ class StripeScraper(BlogScraper):
                     image_url = None
 
 
+        # 6. Content
+        content = None
+        body = soup.select_one(".BlogPost__body")
+        if body:
+             content = body.get_text(separator="\n\n", strip=True)
+
         return PostMetadata(
             title=title,
             url=post_url,
@@ -111,5 +117,6 @@ class StripeScraper(BlogScraper):
             authors=authors,
             published_date=published_date,
             site_name="Stripe Engineering",
-            image_url=image_url
+            image_url=image_url,
+            content=content
         )
