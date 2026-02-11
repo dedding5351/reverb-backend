@@ -17,10 +17,6 @@ async def lifespan(app: FastAPI):
     scheduler = SchedulerService()
     scheduler.start()
     
-    # Trigger immediate run for testing (fire and forget)
-    import asyncio
-    asyncio.create_task(scheduler.run_daily_ingestion())
-    
     yield
     # Shutdown
 
